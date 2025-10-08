@@ -330,10 +330,19 @@ await new Command()
     
     let body: string | undefined;
     if (hasBody) {
-      body = await Input.prompt({
-        message: "Enter the commit body",
+      const bodyInput = await Input.prompt({
+        message: "Enter the commit body (use \\n for new lines)",
         hint: "Provide additional context about the change",
       });
+
+      // Parse \n escape sequences to actual newlines
+      body = bodyInput.replace(/\\n/g, '\n');
+
+      if (body) {
+        console.log(colors.green("\n✓ Body captured\n"));
+        console.log(colors.dim("Preview:"));
+        console.log(colors.dim(body.split('\n').map(l => `  ${l}`).join('\n') + "\n"));
+      }
     }
     
     const breaking = await Confirm.prompt({
@@ -343,10 +352,13 @@ await new Command()
     
     let breakingDescription: string | undefined;
     if (breaking) {
-      breakingDescription = await Input.prompt({
-        message: "Describe the breaking change",
+      const breakingInput = await Input.prompt({
+        message: "Describe the breaking change (use \\n for new lines)",
         minLength: 1,
       });
+
+      // Parse \n escape sequences to actual newlines
+      breakingDescription = breakingInput.replace(/\\n/g, '\n');
     }
     
     const hasFooters = await Confirm.prompt({
