@@ -21,13 +21,13 @@ An **interactive CLI tool built with Deno** to help you generate **Conventional 
 ### Option 1 — Run Directly with Deno
 
 ```bash
-deno run --allow-run --allow-read https://raw.githubusercontent.com/vineyrawat/auto-commit/main/auto_commit.ts
+deno run --allow-run --allow-read https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
 ```
 
 ### Option 2 — Install Globally
 
 ```bash
-deno install --allow-run --allow-read -n auto-commit https://raw.githubusercontent.com/vineyrawat/auto-commit/main/auto_commit.ts
+deno install --allow-run --allow-read --global -n auto-commit https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
 ```
 
 Now you can run:
