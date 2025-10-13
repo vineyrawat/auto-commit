@@ -30,7 +30,7 @@ interface CommitMessage {
   footers: Array<{ token: string; value: string }>;
 }
 
-const CONFIG_DIR = `${Deno.env.get("HOME")}/.config/commit-cli`;
+const CONFIG_DIR = `${Deno.env.get("HOME")}/.config/auto-commit`;
 const CONFIG_FILE = `${CONFIG_DIR}/config.json`;
 
 interface Config {
@@ -574,7 +574,7 @@ await new Command()
 
       const apiKey = await Input.prompt({
         message: `Enter your ${providerName} API key`,
-        hint: "Will be stored locally in ~/.config/commit-cli/config.json",
+        hint: "Will be stored locally in ~/.config/auto-commit/config.json",
       });
 
       switch (provider) {
