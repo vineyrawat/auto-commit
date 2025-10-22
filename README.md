@@ -259,6 +259,6 @@ MIT License © 2025 [Viney Rawat](https://github.com/vineyrawat)
 
 ---
 
-**Made with ❤️ by developers, for developers**
+**Made with ❤️ by [@vineyrawat](https://github.com/vineyrawat), for developers**
 
 Need help? Found a bug? [Open an issue](https://github.com/vineyrawat/auto-commit/issues)
