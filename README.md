@@ -32,13 +32,13 @@ A powerful interactive CLI tool for generating [Conventional Commit](https://www
 ### Option 1 — Run Directly with Deno
 
 ```bash
-deno run --allow-run --allow-read https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
+deno run --allow-run --allow-net --allow-write --allow-env --allow-read https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
 ```
 
 ### Option 2 — Install Globally
 
 ```bash
-deno install --allow-run --allow-read --global -n auto-commit https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
+deno install --allow-run --allow-net --allow-write --allow-env --allow-read --global -n auto-commit https://raw.githubusercontent.com/vineyrawat/auto-commit/refs/heads/main/main.ts
 ```
 
 Now you can run:
