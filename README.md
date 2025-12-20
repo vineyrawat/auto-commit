@@ -2,7 +2,7 @@
 
 A powerful interactive CLI tool for generating [Conventional Commit](https://www.conventionalcommits.org/) messages with AI assistance. Built with Deno and TypeScript.
 
-## ✨ Features
+## Features
 
 ### 🤖 AI-Powered Commit Generation
 - **Multiple AI Providers**: OpenAI, Google Gemini, Anthropic Claude, and Groq
@@ -83,27 +83,19 @@ Configuration options:
 
 ### AI Providers
 
-#### 🔵 OpenAI (GPT-4)
-- **Models**: GPT-4o-mini (recommended), GPT-4o, GPT-4-turbo, GPT-3.5-turbo
-- **Pricing**: Pay per use
+#### OpenAI
 - **API Key**: Get at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
-#### 🟢 Google Gemini ⭐
-- **Models**: Gemini-2.0-flash-exp (recommended, free), Gemini-1.5-flash, Gemini-1.5-pro
-- **Pricing**: Generous free tier
+#### Google Gemini
 - **API Key**: Get at [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
 
-#### 🟣 Anthropic Claude
-- **Models**: Claude Sonnet 4.5 (recommended), Claude 3.5 Sonnet, Claude 3 Haiku
-- **Pricing**: High quality responses
+#### Anthropic Claude
 - **API Key**: Get at [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
 
-#### 🟠 Groq ⭐
-- **Models**: Llama-3.3-70b (recommended, fast & free), Llama-3.1-70b, Mixtral-8x7b, Gemma2-9b
-- **Pricing**: Very fast with free tier
+#### Groq
 - **API Key**: Get at [console.groq.com/keys](https://console.groq.com/keys)
 
-## 📋 Workflow
+## Workflow
 
 ### 1. File Staging (Interactive)
 ```bash
