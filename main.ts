@@ -526,7 +526,7 @@ async function commitMessage(message: string, noVerify: boolean): Promise<void> 
 
 await new Command()
   .name("commit")
-  .version("1.0.0")
+  .version("1.2.0")
   .description("Generate conventional commit messages interactively")
   .option("-n, --no-verify", "Bypass git hooks")
   .option("-d, --dry-run", "Show the commit message without committing")
