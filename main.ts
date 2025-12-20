@@ -49,43 +49,55 @@ const PROVIDER_INFO = {
   openai: {
     name: "OpenAI",
     models: [
-      { name: "gpt-4o-mini (recommended)", value: "gpt-4o-mini" },
-      { name: "gpt-4o", value: "gpt-4o" },
-      { name: "gpt-4-turbo", value: "gpt-4-turbo" },
-      { name: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
+      { name: "gpt-5.2-instant (recommended, latest 2025)", value: "gpt-5.2-instant" },
+      { name: "gpt-5.2-thinking (advanced reasoning)", value: "gpt-5.2-thinking" },
+      { name: "gpt-5-instant (fast, default)", value: "gpt-5-instant" },
+      { name: "gpt-5-thinking (enhanced reasoning)", value: "gpt-5-thinking" },
+      { name: "gpt-4o-mini (legacy)", value: "gpt-4o-mini" },
+      { name: "gpt-4o (legacy)", value: "gpt-4o" },
+      { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gpt-4o-mini",
+    defaultModel: "gpt-5.2-instant",
     apiKeyUrl: "https://platform.openai.com/api-keys",
   },
   gemini: {
     name: "Google Gemini",
     models: [
-      { name: "gemini-2.0-flash-exp (recommended, free)", value: "gemini-2.0-flash-exp" },
-      { name: "gemini-1.5-flash", value: "gemini-1.5-flash" },
-      { name: "gemini-1.5-pro", value: "gemini-1.5-pro" },
+      { name: "gemini-3-flash (recommended, latest 2025)", value: "gemini-3-flash" },
+      { name: "gemini-3-pro (advanced reasoning)", value: "gemini-3-pro" },
+      { name: "gemini-2.5-flash (fast, large scale)", value: "gemini-2.5-flash" },
+      { name: "gemini-2.5-pro (most intelligent)", value: "gemini-2.5-pro" },
+      { name: "gemini-2.0-flash-exp (experimental)", value: "gemini-2.0-flash-exp" },
+      { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gemini-2.0-flash-exp",
+    defaultModel: "gemini-3-flash",
     apiKeyUrl: "https://aistudio.google.com/app/apikey",
   },
   anthropic: {
     name: "Anthropic Claude",
     models: [
-      { name: "claude-sonnet-4-5 (recommended)", value: "claude-sonnet-4-5-20250929" },
-      { name: "claude-3-5-sonnet", value: "claude-3-5-sonnet-20241022" },
-      { name: "claude-3-haiku", value: "claude-3-haiku-20240307" },
+      { name: "claude-opus-4-5 (recommended, latest 2025)", value: "claude-opus-4-5-20251101" },
+      { name: "claude-haiku-4-5 (fast, low cost)", value: "claude-haiku-4-5-20251015" },
+      { name: "claude-sonnet-4 (balanced)", value: "claude-sonnet-4-20250522" },
+      { name: "claude-opus-4-1 (agentic tasks)", value: "claude-opus-4-1-20250805" },
+      { name: "claude-sonnet-4-5 (legacy)", value: "claude-sonnet-4-5-20250929" },
+      { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "claude-sonnet-4-5-20250929",
+    defaultModel: "claude-opus-4-5-20251101",
     apiKeyUrl: "https://console.anthropic.com/settings/keys",
   },
   groq: {
     name: "Groq",
     models: [
-      { name: "llama-3.3-70b (recommended, fast & free)", value: "llama-3.3-70b-versatile" },
-      { name: "llama-3.1-70b", value: "llama-3.1-70b-versatile" },
-      { name: "mixtral-8x7b", value: "mixtral-8x7b-32768" },
-      { name: "gemma2-9b", value: "gemma2-9b-it" },
+      { name: "gpt-oss-120b (recommended, latest 2025)", value: "gpt-oss-120b" },
+      { name: "llama-4 (latest llama)", value: "llama-4" },
+      { name: "llama-3.3-70b (fast & free)", value: "llama-3.3-70b-versatile" },
+      { name: "llama-3-groq-70b-tool-use (best for function calling)", value: "llama-3-groq-70b-tool-use" },
+      { name: "llama-3.1-70b (legacy)", value: "llama-3.1-70b-versatile" },
+      { name: "mixtral-8x7b (legacy)", value: "mixtral-8x7b-32768" },
+      { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "llama-3.3-70b-versatile",
+    defaultModel: "gpt-oss-120b",
     apiKeyUrl: "https://console.groq.com/keys",
   },
 };
@@ -598,10 +610,19 @@ await new Command()
       const provider = config.provider || "openai";
       const providerName = PROVIDER_INFO[provider].name;
 
-      const model = await Select.prompt({
+      let model = await Select.prompt({
         message: `Select ${providerName} model`,
         options: PROVIDER_INFO[provider].models,
       });
+
+      // Handle custom model input
+      if (model === "__custom__") {
+        model = await Input.prompt({
+          message: `Enter custom ${providerName} model name`,
+          hint: "e.g., gpt-4-turbo-preview, claude-3-opus-20240229",
+          minLength: 1,
+        });
+      }
 
       switch (provider) {
         case "openai":
