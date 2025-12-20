@@ -1,3 +1,5 @@
+<img width="1024" height="434" alt="image" src="https://github.com/user-attachments/assets/bbc0aea5-8859-4434-b096-3b1bc03e775b" />
+
 # 🚀 Auto Commit
 
 A powerful interactive CLI tool for generating [Conventional Commit](https://www.conventionalcommits.org/) messages with AI assistance. Built with Deno and TypeScript.
