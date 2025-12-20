@@ -49,55 +49,51 @@ const PROVIDER_INFO = {
   openai: {
     name: "OpenAI",
     models: [
-      { name: "gpt-5.2-instant (recommended, latest 2025)", value: "gpt-5.2-instant" },
-      { name: "gpt-5.2-thinking (advanced reasoning)", value: "gpt-5.2-thinking" },
-      { name: "gpt-5-instant (fast, default)", value: "gpt-5-instant" },
-      { name: "gpt-5-thinking (enhanced reasoning)", value: "gpt-5-thinking" },
-      { name: "gpt-4o-mini (legacy)", value: "gpt-4o-mini" },
-      { name: "gpt-4o (legacy)", value: "gpt-4o" },
+      { name: "gpt-4o (recommended)", value: "gpt-4o" },
+      { name: "gpt-4o-mini (fast & cheap)", value: "gpt-4o-mini" },
+      { name: "gpt-4-turbo", value: "gpt-4-turbo" },
+      { name: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gpt-5.2-instant",
+    defaultModel: "gpt-4o-mini",
     apiKeyUrl: "https://platform.openai.com/api-keys",
   },
   gemini: {
     name: "Google Gemini",
     models: [
-      { name: "gemini-3-flash (recommended, latest 2025)", value: "gemini-3-flash" },
-      { name: "gemini-3-pro (advanced reasoning)", value: "gemini-3-pro" },
-      { name: "gemini-2.5-flash (fast, large scale)", value: "gemini-2.5-flash" },
+      { name: "gemini-2.5-flash (recommended, stable)", value: "gemini-2.5-flash" },
       { name: "gemini-2.5-pro (most intelligent)", value: "gemini-2.5-pro" },
+      { name: "gemini-3-flash-preview (latest, preview)", value: "gemini-3-flash-preview" },
+      { name: "gemini-3-pro-preview (advanced reasoning)", value: "gemini-3-pro-preview" },
       { name: "gemini-2.0-flash-exp (experimental)", value: "gemini-2.0-flash-exp" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gemini-3-flash",
+    defaultModel: "gemini-2.5-flash",
     apiKeyUrl: "https://aistudio.google.com/app/apikey",
   },
   anthropic: {
     name: "Anthropic Claude",
     models: [
-      { name: "claude-opus-4-5 (recommended, latest 2025)", value: "claude-opus-4-5-20251101" },
-      { name: "claude-haiku-4-5 (fast, low cost)", value: "claude-haiku-4-5-20251015" },
-      { name: "claude-sonnet-4 (balanced)", value: "claude-sonnet-4-20250522" },
-      { name: "claude-opus-4-1 (agentic tasks)", value: "claude-opus-4-1-20250805" },
-      { name: "claude-sonnet-4-5 (legacy)", value: "claude-sonnet-4-5-20250929" },
+      { name: "claude-3-5-sonnet (recommended)", value: "claude-3-5-sonnet-20241022" },
+      { name: "claude-3-opus", value: "claude-3-opus-20240229" },
+      { name: "claude-3-haiku (fast & cheap)", value: "claude-3-haiku-20240307" },
+      { name: "claude-3-sonnet", value: "claude-3-sonnet-20240229" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "claude-opus-4-5-20251101",
+    defaultModel: "claude-3-5-sonnet-20241022",
     apiKeyUrl: "https://console.anthropic.com/settings/keys",
   },
   groq: {
     name: "Groq",
     models: [
-      { name: "gpt-oss-120b (recommended, latest 2025)", value: "gpt-oss-120b" },
-      { name: "llama-4 (latest llama)", value: "llama-4" },
-      { name: "llama-3.3-70b (fast & free)", value: "llama-3.3-70b-versatile" },
-      { name: "llama-3-groq-70b-tool-use (best for function calling)", value: "llama-3-groq-70b-tool-use" },
-      { name: "llama-3.1-70b (legacy)", value: "llama-3.1-70b-versatile" },
-      { name: "mixtral-8x7b (legacy)", value: "mixtral-8x7b-32768" },
+      { name: "openai/gpt-oss-120b (recommended)", value: "openai/gpt-oss-120b" },
+      { name: "llama-3.3-70b-versatile (fast & free)", value: "llama-3.3-70b-versatile" },
+      { name: "llama-3.1-8b-instant (fastest)", value: "llama-3.1-8b-instant" },
+      { name: "qwen/qwen3-32b (preview)", value: "qwen/qwen3-32b" },
+      { name: "meta-llama/llama-4-scout-17b (preview, multimodal)", value: "meta-llama/llama-4-scout-17b-16e-instruct" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gpt-oss-120b",
+    defaultModel: "llama-3.3-70b-versatile",
     apiKeyUrl: "https://console.groq.com/keys",
   },
 };
@@ -294,7 +290,8 @@ async function generateWithGroq(diff: string, apiKey: string, model: string): Pr
 function getPrompt(diff: string): string {
   return `You are a commit message generator. Based on the following git diff, generate a conventional commit message.
 
-Analyze the changes and provide a JSON response with this exact structure:
+Analyze the changes and provide a JSON response with this exact structure (respond with ONLY valid JSON, no markdown, no explanation):
+
 {
   "type": "feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert",
   "scope": "optional scope or null",
@@ -316,7 +313,7 @@ Git diff:
 ${diff.slice(0, 8000)}
 \`\`\`
 
-Respond ONLY with the JSON object, no other text.`;
+Respond with valid JSON only. Do not include any markdown formatting, code blocks, or explanatory text.`;
 }
 
 function parseAIResponse(content: string): CommitMessage | null {
@@ -336,6 +333,7 @@ function parseAIResponse(content: string): CommitMessage | null {
     };
   } catch (error) {
     console.error(colors.red(`Failed to parse AI response: ${error}`));
+    console.error(colors.dim(`Response content: ${content.substring(0, 200)}...`));
     return null;
   }
 }
