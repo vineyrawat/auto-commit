@@ -49,51 +49,62 @@ const PROVIDER_INFO = {
   openai: {
     name: "OpenAI",
     models: [
-      { name: "gpt-4o (recommended)", value: "gpt-4o" },
-      { name: "gpt-4o-mini (fast & cheap)", value: "gpt-4o-mini" },
-      { name: "gpt-4-turbo", value: "gpt-4-turbo" },
-      { name: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
+      { name: "gpt-5.5 (recommended, smartest)", value: "gpt-5.5" },
+      { name: "gpt-5.5-pro (advanced reasoning)", value: "gpt-5.5-pro" },
+      { name: "gpt-5.5-instant (fast default)", value: "gpt-5.5-instant" },
+      { name: "gpt-5 (stable flagship)", value: "gpt-5" },
+      { name: "gpt-5-mini (cheap)", value: "gpt-5-mini" },
+      { name: "gpt-5-nano (fastest)", value: "gpt-5-nano" },
+      { name: "gpt-4.1 (long context)", value: "gpt-4.1" },
+      { name: "o3 (reasoning)", value: "o3" },
+      { name: "o4-mini (fast reasoning)", value: "o4-mini" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gpt-4o-mini",
+    defaultModel: "gpt-5.5-instant",
     apiKeyUrl: "https://platform.openai.com/api-keys",
   },
   gemini: {
     name: "Google Gemini",
     models: [
-      { name: "gemini-2.5-flash (recommended, stable)", value: "gemini-2.5-flash" },
-      { name: "gemini-2.5-pro (most intelligent)", value: "gemini-2.5-pro" },
-      { name: "gemini-3-flash-preview (latest, preview)", value: "gemini-3-flash-preview" },
-      { name: "gemini-3-pro-preview (advanced reasoning)", value: "gemini-3-pro-preview" },
-      { name: "gemini-2.0-flash-exp (experimental)", value: "gemini-2.0-flash-exp" },
+      { name: "gemini-3-pro-preview (recommended, top reasoning)", value: "gemini-3-pro-preview" },
+      { name: "gemini-3-flash (Pro intelligence at Flash speed)", value: "gemini-3-flash" },
+      { name: "gemini-3-flash-lite (cheapest, fastest)", value: "gemini-3-flash-lite" },
+      { name: "gemini-2.5-pro (stable, high quality)", value: "gemini-2.5-pro" },
+      { name: "gemini-2.5-flash (stable, fast)", value: "gemini-2.5-flash" },
+      { name: "gemini-2.5-flash-lite", value: "gemini-2.5-flash-lite" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "gemini-2.5-flash",
+    defaultModel: "gemini-3-flash",
     apiKeyUrl: "https://aistudio.google.com/app/apikey",
   },
   anthropic: {
     name: "Anthropic Claude",
     models: [
-      { name: "claude-3-5-sonnet (recommended)", value: "claude-3-5-sonnet-20241022" },
-      { name: "claude-3-opus", value: "claude-3-opus-20240229" },
-      { name: "claude-3-haiku (fast & cheap)", value: "claude-3-haiku-20240307" },
-      { name: "claude-3-sonnet", value: "claude-3-sonnet-20240229" },
+      { name: "claude-opus-4-7 (flagship, most capable)", value: "claude-opus-4-7" },
+      { name: "claude-sonnet-4-6 (recommended, best price/perf)", value: "claude-sonnet-4-6" },
+      { name: "claude-haiku-4-5 (fast & cheap)", value: "claude-haiku-4-5" },
+      { name: "claude-opus-4-1", value: "claude-opus-4-1-20250805" },
+      { name: "claude-sonnet-4-5", value: "claude-sonnet-4-5-20250929" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "claude-3-5-sonnet-20241022",
+    defaultModel: "claude-sonnet-4-6",
     apiKeyUrl: "https://console.anthropic.com/settings/keys",
   },
   groq: {
     name: "Groq",
     models: [
       { name: "openai/gpt-oss-120b (recommended)", value: "openai/gpt-oss-120b" },
-      { name: "llama-3.3-70b-versatile (fast & free)", value: "llama-3.3-70b-versatile" },
+      { name: "openai/gpt-oss-20b (fast & cheap)", value: "openai/gpt-oss-20b" },
+      { name: "moonshotai/kimi-k2-instruct (long context)", value: "moonshotai/kimi-k2-instruct" },
+      { name: "deepseek-r1-distill-llama-70b (reasoning)", value: "deepseek-r1-distill-llama-70b" },
+      { name: "llama-3.3-70b-versatile", value: "llama-3.3-70b-versatile" },
       { name: "llama-3.1-8b-instant (fastest)", value: "llama-3.1-8b-instant" },
-      { name: "qwen/qwen3-32b (preview)", value: "qwen/qwen3-32b" },
-      { name: "meta-llama/llama-4-scout-17b (preview, multimodal)", value: "meta-llama/llama-4-scout-17b-16e-instruct" },
+      { name: "meta-llama/llama-4-scout-17b (multimodal)", value: "meta-llama/llama-4-scout-17b-16e-instruct" },
+      { name: "meta-llama/llama-4-maverick-17b", value: "meta-llama/llama-4-maverick-17b-128e-instruct" },
+      { name: "qwen/qwen3-32b", value: "qwen/qwen3-32b" },
       { name: "✏️  Custom model name", value: "__custom__" },
     ],
-    defaultModel: "llama-3.3-70b-versatile",
+    defaultModel: "openai/gpt-oss-120b",
     apiKeyUrl: "https://console.groq.com/keys",
   },
 };
@@ -136,7 +147,47 @@ async function getDiff(): Promise<string> {
   }
 }
 
-async function generateWithOpenAI(diff: string, apiKey: string, model: string): Promise<CommitMessage | null> {
+async function getDiffStat(): Promise<string> {
+  try {
+    const process = new Deno.Command("git", {
+      args: ["diff", "--cached", "--stat"],
+      stdout: "piped",
+      stderr: "piped",
+    });
+
+    const { stdout, success } = await process.output();
+
+    if (!success) {
+      return "";
+    }
+
+    return new TextDecoder().decode(stdout);
+  } catch {
+    return "";
+  }
+}
+
+async function getDiffNameStatus(): Promise<string> {
+  try {
+    const process = new Deno.Command("git", {
+      args: ["diff", "--cached", "--name-status"],
+      stdout: "piped",
+      stderr: "piped",
+    });
+
+    const { stdout, success } = await process.output();
+
+    if (!success) {
+      return "";
+    }
+
+    return new TextDecoder().decode(stdout);
+  } catch {
+    return "";
+  }
+}
+
+async function generateWithOpenAI(diff: string, fileList: string, diffStat: string, apiKey: string, model: string): Promise<CommitMessage | null> {
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -153,7 +204,7 @@ async function generateWithOpenAI(diff: string, apiKey: string, model: string): 
           },
           {
             role: "user",
-            content: getPrompt(diff)
+            content: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.openai)
           }
         ],
         temperature: 0.7,
@@ -175,7 +226,7 @@ async function generateWithOpenAI(diff: string, apiKey: string, model: string): 
   }
 }
 
-async function generateWithGemini(diff: string, apiKey: string, model: string): Promise<CommitMessage | null> {
+async function generateWithGemini(diff: string, fileList: string, diffStat: string, apiKey: string, model: string): Promise<CommitMessage | null> {
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -187,7 +238,7 @@ async function generateWithGemini(diff: string, apiKey: string, model: string): 
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: getPrompt(diff)
+              text: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.gemini)
             }]
           }],
           generationConfig: {
@@ -213,7 +264,7 @@ async function generateWithGemini(diff: string, apiKey: string, model: string): 
   }
 }
 
-async function generateWithAnthropic(diff: string, apiKey: string, model: string): Promise<CommitMessage | null> {
+async function generateWithAnthropic(diff: string, fileList: string, diffStat: string, apiKey: string, model: string): Promise<CommitMessage | null> {
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -228,7 +279,7 @@ async function generateWithAnthropic(diff: string, apiKey: string, model: string
         messages: [
           {
             role: "user",
-            content: getPrompt(diff)
+            content: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.anthropic)
           }
         ],
       }),
@@ -248,7 +299,7 @@ async function generateWithAnthropic(diff: string, apiKey: string, model: string
   }
 }
 
-async function generateWithGroq(diff: string, apiKey: string, model: string): Promise<CommitMessage | null> {
+async function generateWithGroq(diff: string, fileList: string, diffStat: string, apiKey: string, model: string): Promise<CommitMessage | null> {
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -265,7 +316,7 @@ async function generateWithGroq(diff: string, apiKey: string, model: string): Pr
           },
           {
             role: "user",
-            content: getPrompt(diff)
+            content: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.groq)
           }
         ],
         temperature: 0.7,
@@ -287,10 +338,56 @@ async function generateWithGroq(diff: string, apiKey: string, model: string): Pr
   }
 }
 
-function getPrompt(diff: string): string {
-  return `You are a commit message generator. Based on the following git diff, generate a conventional commit message.
+const DIFF_CHAR_LIMITS: Record<AIProvider, number> = {
+  openai: 200000,
+  gemini: 400000,
+  anthropic: 400000,
+  groq: 60000,
+};
 
-Analyze the changes and provide a JSON response with this exact structure (respond with ONLY valid JSON, no markdown, no explanation):
+function buildDiffContext(diff: string, fileList: string, diffStat: string, charLimit: number): string {
+  if (diff.length <= charLimit) {
+    return `Files changed (name-status):
+${fileList || "(none)"}
+
+Diff stat:
+${diffStat || "(none)"}
+
+Full diff:
+\`\`\`
+${diff}
+\`\`\``;
+  }
+
+  // Per-file truncation: keep head of each file's hunk so all files are represented.
+  const fileChunks = diff.split(/^diff --git /m).filter(Boolean);
+  const perFileBudget = Math.max(800, Math.floor(charLimit / Math.max(fileChunks.length, 1)));
+  const truncatedChunks = fileChunks.map(chunk => {
+    const prefixed = `diff --git ${chunk}`;
+    if (prefixed.length <= perFileBudget) return prefixed;
+    return prefixed.slice(0, perFileBudget) + `\n... [truncated ${prefixed.length - perFileBudget} chars]\n`;
+  });
+  const truncatedDiff = truncatedChunks.join("");
+
+  return `Files changed (name-status):
+${fileList || "(none)"}
+
+Diff stat:
+${diffStat || "(none)"}
+
+Diff (per-file truncated to fit context — every file represented):
+\`\`\`
+${truncatedDiff.slice(0, charLimit)}
+\`\`\``;
+}
+
+function getPrompt(diff: string, fileList: string, diffStat: string, charLimit: number): string {
+  const context = buildDiffContext(diff, fileList, diffStat, charLimit);
+  return `You are a commit message generator. Based on the following git changes, generate a conventional commit message.
+
+The "Files changed" list is authoritative — your message MUST reflect ALL files in that list, not only the ones whose diff body appears below. If many files change, summarize the dominant theme across all of them.
+
+Provide a JSON response with this exact structure (respond with ONLY valid JSON, no markdown, no explanation):
 
 {
   "type": "feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert",
@@ -305,13 +402,10 @@ Rules:
 - Choose the most appropriate type based on the changes
 - Keep description concise and in imperative mood
 - Use scope only if changes are focused on a specific area
-- Add body only if changes need additional context
+- Add body only if changes need additional context (recommended when 5+ files changed)
 - Set breaking to true only for breaking changes
 
-Git diff:
-\`\`\`
-${diff.slice(0, 8000)}
-\`\`\`
+${context}
 
 Respond with valid JSON only. Do not include any markdown formatting, code blocks, or explanatory text.`;
 }
@@ -338,38 +432,60 @@ function parseAIResponse(content: string): CommitMessage | null {
   }
 }
 
-async function generateCommitWithAI(diff: string, config: Config): Promise<CommitMessage | null> {
-  console.log(colors.dim("\n🤖 Generating commit message with AI...\n"));
+function startSpinner(label: string): () => void {
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+  let i = 0;
+  const encoder = new TextEncoder();
+  const writeRaw = (s: string) => Deno.stdout.writeSync(encoder.encode(s));
+  writeRaw("\x1b[?25l"); // hide cursor
+  const id = setInterval(() => {
+    writeRaw(`\r${colors.cyan(frames[i = (i + 1) % frames.length])} ${label}`);
+  }, 80);
+  return () => {
+    clearInterval(id);
+    writeRaw(`\r\x1b[2K`); // clear line
+    writeRaw("\x1b[?25h"); // restore cursor
+  };
+}
 
+async function generateCommitWithAI(diff: string, fileList: string, diffStat: string, config: Config): Promise<CommitMessage | null> {
   const provider = config.provider || "openai";
+  const fileCount = fileList.split("\n").filter(Boolean).length;
+  const stop = startSpinner(
+    `Generating commit message with ${PROVIDER_INFO[provider].name}${fileCount ? ` (${fileCount} file${fileCount === 1 ? "" : "s"})` : ""}...`
+  );
 
-  switch (provider) {
-    case "openai": {
-      const apiKey = config.openaiApiKey;
-      const model = config.openaiModel || PROVIDER_INFO.openai.defaultModel;
-      if (!apiKey) return null;
-      return await generateWithOpenAI(diff, apiKey, model);
+  try {
+    switch (provider) {
+      case "openai": {
+        const apiKey = config.openaiApiKey;
+        const model = config.openaiModel || PROVIDER_INFO.openai.defaultModel;
+        if (!apiKey) return null;
+        return await generateWithOpenAI(diff, fileList, diffStat, apiKey, model);
+      }
+      case "gemini": {
+        const apiKey = config.geminiApiKey;
+        const model = config.geminiModel || PROVIDER_INFO.gemini.defaultModel;
+        if (!apiKey) return null;
+        return await generateWithGemini(diff, fileList, diffStat, apiKey, model);
+      }
+      case "anthropic": {
+        const apiKey = config.anthropicApiKey;
+        const model = config.anthropicModel || PROVIDER_INFO.anthropic.defaultModel;
+        if (!apiKey) return null;
+        return await generateWithAnthropic(diff, fileList, diffStat, apiKey, model);
+      }
+      case "groq": {
+        const apiKey = config.groqApiKey;
+        const model = config.groqModel || PROVIDER_INFO.groq.defaultModel;
+        if (!apiKey) return null;
+        return await generateWithGroq(diff, fileList, diffStat, apiKey, model);
+      }
+      default:
+        return null;
     }
-    case "gemini": {
-      const apiKey = config.geminiApiKey;
-      const model = config.geminiModel || PROVIDER_INFO.gemini.defaultModel;
-      if (!apiKey) return null;
-      return await generateWithGemini(diff, apiKey, model);
-    }
-    case "anthropic": {
-      const apiKey = config.anthropicApiKey;
-      const model = config.anthropicModel || PROVIDER_INFO.anthropic.defaultModel;
-      if (!apiKey) return null;
-      return await generateWithAnthropic(diff, apiKey, model);
-    }
-    case "groq": {
-      const apiKey = config.groqApiKey;
-      const model = config.groqModel || PROVIDER_INFO.groq.defaultModel;
-      if (!apiKey) return null;
-      return await generateWithGroq(diff, apiKey, model);
-    }
-    default:
-      return null;
+  } finally {
+    stop();
   }
 }
 
@@ -803,7 +919,8 @@ await new Command()
           console.log(colors.yellow("\n⚠ No diff found for AI generation. Using manual mode.\n"));
           useAI = false;
         } else {
-          const aiCommit = await generateCommitWithAI(diff, config);
+          const [fileList, diffStat] = await Promise.all([getDiffNameStatus(), getDiffStat()]);
+          const aiCommit = await generateCommitWithAI(diff, fileList, diffStat, config);
           if (aiCommit) {
             commit = aiCommit;
 
@@ -825,8 +942,7 @@ await new Command()
             if (useGenerated === "use") {
               // Use the AI-generated commit as is
             } else if (useGenerated === "regenerate") {
-              console.log(colors.dim("\n🔄 Regenerating...\n"));
-              const newAiCommit = await generateCommitWithAI(diff, config);
+              const newAiCommit = await generateCommitWithAI(diff, fileList, diffStat, config);
               if (newAiCommit) {
                 commit = newAiCommit;
               }
