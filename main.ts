@@ -189,27 +189,34 @@ async function getDiffNameStatus(): Promise<string> {
 
 async function generateWithOpenAI(diff: string, fileList: string, diffStat: string, apiKey: string, model: string): Promise<CommitMessage | null> {
   try {
+    // GPT-5.x, o-series, and newer models require max_completion_tokens and reject custom temperature.
+    const isNewApi = /^(gpt-5|o\d|gpt-4\.1)/i.test(model);
+    const body: Record<string, unknown> = {
+      model: model,
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that generates conventional commit messages. Always respond with valid JSON only."
+        },
+        {
+          role: "user",
+          content: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.openai)
+        }
+      ],
+    };
+    if (isNewApi) {
+      body.max_completion_tokens = 2000;
+    } else {
+      body.max_tokens = 500;
+      body.temperature = 0.7;
+    }
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful assistant that generates conventional commit messages. Always respond with valid JSON only."
-          },
-          {
-            role: "user",
-            content: getPrompt(diff, fileList, diffStat, DIFF_CHAR_LIMITS.openai)
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -219,7 +226,13 @@ async function generateWithOpenAI(diff: string, fileList: string, diffStat: stri
     }
 
     const data = await response.json();
-    return parseAIResponse(data.choices[0].message.content);
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) {
+      const finishReason = data?.choices?.[0]?.finish_reason;
+      console.error(colors.red(`OpenAI returned empty content (finish_reason=${finishReason}). Model may have spent all tokens on reasoning. Try a non-reasoning model or increase token limit.`));
+      return null;
+    }
+    return parseAIResponse(content);
   } catch (error) {
     console.error(colors.red(`OpenAI error: ${error}`));
     return null;
