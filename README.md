@@ -24,7 +24,8 @@ A powerful interactive CLI tool for generating [Conventional Commit](https://www
 - **Persistent Settings**: Stores API keys and preferences locally
 - **Easy Setup**: Simple configuration wizard
 - **Provider Switching**: Easily switch between AI providers
-- **Secure Storage**: API keys stored in `~/.config/auto-commit/config.json`
+- **Secure Storage**: API keys stored in `~/.config/auto-commit/config.json` (owner-only permissions), or read from environment variables
+- **Deprecation Warnings**: Warns when your configured model is retired or about to be, and suggests a replacement
 
 ## 📦 Installation
 ### Prerequisites
@@ -86,17 +87,14 @@ Configuration options:
 
 ### AI Providers
 
-#### OpenAI
-- **API Key**: Get at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+| Provider | Default model | Env var | Get a key |
+|----------|---------------|---------|-----------|
+| OpenAI | `gpt-6.1-terra` | `OPENAI_API_KEY` | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| Google Gemini | `gemini-3.8-flash` | `GEMINI_API_KEY` | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
+| Anthropic Claude | `claude-haiku-5-5` | `ANTHROPIC_API_KEY` | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
+| Groq | `openai/gpt-oss-120b` | `GROQ_API_KEY` | [console.groq.com/keys](https://console.groq.com/keys) |
 
-#### Google Gemini
-- **API Key**: Get at [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
-
-#### Anthropic Claude
-- **API Key**: Get at [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
-
-#### Groq
-- **API Key**: Get at [console.groq.com/keys](https://console.groq.com/keys)
+A key saved with `auto-commit config` takes precedence; the env var is used when no key is saved. Any model ID can be entered via **Set AI Model → Custom model name**.
 
 ## Workflow
 
@@ -223,7 +221,7 @@ Clients must update to v2 endpoints.
 ### Features
 - ✅ Zero dependencies (except Cliffy)
 - ✅ Secure local config storage
-- ✅ Graceful error handling
+- ✅ Graceful error handling (timeouts, retries on rate limits, actionable hints)
 - ✅ Color-coded terminal output
 - ✅ Git hook support with `--no-verify`
 - ✅ Dry-run mode for testing
